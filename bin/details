@@ -1,0 +1,61 @@
+if [[ -z "$1" ]]; then
+  echo "Usage: details <binary_name>"
+  exit 1
+fi
+
+BINARY_PATH=$(command -v "$1")
+
+echo "🔍 Searching for '$1'..."
+
+if [[ -z "$BINARY_PATH" ]]; then
+  echo "❌ Binary '$1' not found in PATH."
+else
+  echo "✅ Binary found: $BINARY_PATH"
+  BINARY_DIR=$(dirname "$BINARY_PATH")
+  echo "$BINARY_DIR"
+fi
+
+echo ""
+echo "📦 Scanning shared dependencies..."
+DEPENDENCIES=$(ldd "$BINARY_PATH" 2>/dev/null | awk '{print $3}' | grep '^/' | xargs -I {} dirname "{}" | sort -u)
+
+if [[ -z "$DEPENDENCIES" ]]; then
+  echo "⚠️ No shared libraries found (static binary or missing ldd info)."
+else
+  echo "$DEPENDENCIES"
+fi
+
+echo ""
+echo "📂 Searching for related user/system files..."
+
+SEARCH_PATHS=(
+  "$HOME/.config/$1"
+  "$HOME/.local/share/$1"
+  "$HOME/.cache/$1"
+  "/usr/local/etc/$1"
+  "/usr/local/share/$1"
+  "/usr/share/$1"
+  "/var/lib/$1"
+  "/var/cache/$1"
+  "/etc/$1"
+  "/opt/$1"
+  "/srv/$1"
+)
+
+FOUND_PATHS=()
+
+for path in "${SEARCH_PATHS[@]}"; do
+  if [[ -e "$path" ]]; then
+    FOUND_PATHS+=("$path")
+  fi
+done
+
+if [[ ${#FOUND_PATHS[@]} -eq 0 ]]; then
+  echo "⚠️ No additional data/config/cache directories found."
+else
+  printf "%s\n" "${FOUND_PATHS[@]}"
+fi
+
+echo ""
+echo "✅ Done."
+exit 0

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+need md5sum
+
+echo -n $@ | md5sum | cut -d ' ' -f 1

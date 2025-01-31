@@ -1,0 +1,48 @@
+#!/bin/sh
+
+shopt -s lastpipe
+
+CRACKLIB_FILE="/usr/share/dict/cracklib-small"
+NUM="20"
+PASSWORD="n"
+
+if ! has_file $CRACKLIB_FILE > /dev/null 2>&1; then
+    echo "ERROR: 'cracklib' package is not installed."
+    exit 1
+fi
+
+_generate_mnemonics() {
+    [[ $NUM = "" ]] && NUM=20
+    shuf -n $NUM $CRACKLIB_FILE | readarray -t words
+    echo ${words[@]}
+    if [ $PASSWORD = "y" ]; then
+        password=""
+        for word in "${words[@]}"
+        do
+            random=$(( $RANDOM % 2))
+            letter=${word:0:1}
+            if [ $random -eq 1 ]; then
+                password+=${letter^^}
+            else
+                password+=${letter,,}
+            fi
+        done
+        echo -e "\n$password"
+    fi
+}
+
+case $1 in
+    -n)
+        NUM=$2
+        _generate_mnemonics
+        ;;
+    -p)
+        NUM=$2
+        PASSWORD="y"
+        _generate_mnemonics
+        ;;
+    *)
+        echo "mnemonics: available options"
+        echo "  -n [NUM]     Generate mnemonics"
+        echo "  -p [NUM]     Generate password"
+esac

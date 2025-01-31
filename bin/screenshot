@@ -1,0 +1,24 @@
+#!/bin/sh
+
+need maim
+
+case $1 in
+    full)
+        if [ -t 1 ]; then
+            maim -uo ~/Pictures/Screenshots/fullscreen_$(date +%s).png
+        else
+            maim -uo
+        fi
+        ;;
+    select)
+        if [ -t 1 ]; then
+            maim -suo ~/Pictures/Screenshots/ss_$(date +%s).png
+        else
+            maim -suo
+        fi
+        ;;
+    *)
+        echo "screenshot: available options"
+        echo "  full        fullscreen"
+        echo "  select      interactive selection"
+esac

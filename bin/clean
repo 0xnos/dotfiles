@@ -1,0 +1,18 @@
+#!/bin/sh
+
+need cargo
+
+BASE_DIR=$(pwd)
+
+if has_file "Cargo.toml"; then
+  cargo clean
+else
+  for dir in */; do
+    dir=${dir%/}
+    if has_file "$dir/Cargo.toml"; then
+      (cd "$dir" && cargo clean)
+    else
+      echo "Skipping $dir (No Cargo.toml found)"
+    fi
+  done
+fi

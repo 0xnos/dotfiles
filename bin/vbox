@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# set -xr # debugging
+
+need qemu-img
+need qemu-system-x86_64
+
+DEFAULT_PATH="$HOME/.vbox"
+DEFAULT_IMG="$DEFAULT_PATH/linux.img"
+DEFAULT_MEM=4048
+DEFAULT_CPU=4
+DEFAULT_DISKSIZE="50G"
+DEFAULT_SHARE="$DEFAULT_PATH/share"
+DEFAULT_UEFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.fd"
+DEFAULT_UEFI_VARS="/usr/share/edk2-ovmf/OVMF_VARS.fd"
+DEVICE=""
+
+CMDLINE="-m $DEFAULT_MEM -boot d -enable-kvm -net nic -net user -smp $DEFAULT_CPU"
+CMDLINE+=" -drive if=pflash,format=raw,readonly=on,file=$DEFAULT_UEFI_CODE"
+CMDLINE+=" -drive if=pflash,format=raw,file=$DEFAULT_UEFI_VARS"
+CMDLINE+=" -hda $DEFAULT_IMG"
+
+[[ -d $DEFAULT_PATH ]] || mkdir -p $DEFAULT_PATH
+
+_create_img() {
+    qemu-img create -f qcow2 $DEFAULT_IMG $DEFAULT_DISKSIZE
+}
+_system_boot() {
+    sudo qemu-system-x86_64 $CMDLINE $DEVICE
+}
+
+case $1 in
+    create)
+        _create_img
+        ;;
+    destroy)
+        rm -rf $DEFAULT_IMG
+        ;;
+    start)
+        if [ $# -eq 2 ]; then
+            _create_img
+            DEVICE="-cdrom $2"
+        fi
+        _system_boot
+        ;;
+    usb)
+        if [ $# -eq 2 ]; then
+            _create_img
+            DEVICE="-hdb $2"
+        fi
+        _system_boot
+        ;;
+    *)
+        echo "vbox: available options"
+        echo "  start [ISO]      boot the ISO file from CDROM"
+        echo "  usb [ISO]        boot the ISO file from USB"
+        echo "  create           create a new IMG file"
+        echo "  destroy          destroy IMG file"
+esac

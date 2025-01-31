@@ -1,0 +1,5 @@
+#!/bin/sh
+
+need curl
+
+curl -s wttr.in/Moon

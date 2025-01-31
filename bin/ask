@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Examples
+# alias rm="ask rm"
+# alias shutdown="ask shutdown"
+# alias poweroff="ask poweroff"
+
+
+# Prompt the user for confirmation
+echo "Do you want to run \"$@\"? (y/n)"
+read -r response
+case "$response" in
+    [yY][eE][sS]|[yY]) # Accept 'yes', 'Yes', 'y', 'Y', etc.
+        eval "$@"
+        ;;
+    *)
+        echo "Command \"$@\" was not executed."
+    ;;
+esac

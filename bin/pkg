@@ -1,0 +1,49 @@
+#!/bin/sh
+
+if [[ -z "$1" ]]; then
+    echo "Usage: pkg <package_name>"
+    exit 1
+fi
+
+PACKAGE="$1"
+
+echo "🔍 Searching for package '$PACKAGE'..."
+
+# Check if the package is installed
+if ! pacman -Qi "$PACKAGE" &>/dev/null; then
+    echo "❌ Package '$PACKAGE' is not installed."
+    exit 1
+fi
+
+echo "✅ Package found!"
+
+echo ""
+echo "📦 Package Information:"
+pacman -Qi "$PACKAGE" | grep -E "Name|Version|Installed Size|Install Date|Description"
+
+echo ""
+echo "📂 Installed files:"
+pacman -Ql "$PACKAGE" | awk '{print $2}' | sort -u
+
+echo ""
+echo "📌 Configuration files:"
+pacman -Qii "$PACKAGE" | grep "^CONFFILE" | awk '{print $2}'
+
+echo ""
+echo "📁 Cache location:"
+CACHE_PATH=$(pacman -Qlp /var/cache/pacman/pkg/"$PACKAGE"-*.pkg.tar.zst 2>/dev/null | head -n 1)
+
+if [[ -n "$CACHE_PATH" ]]; then
+    echo "/var/cache/pacman/pkg/$PACKAGE-*.pkg.tar.zst"
+else
+    echo "⚠️ No cached package found."
+fi
+
+echo ""
+echo "🔗 Dependencies:"
+pacman -Qi "$PACKAGE" | grep "Depends On" | cut -d ":" -f2
+
+echo ""
+echo "✅ Done."
+exit 0
+

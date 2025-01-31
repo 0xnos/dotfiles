@@ -1,0 +1,5 @@
+#!/bin/sh
+
+need gpg
+
+gpg --recipient $USER --encrypt $1

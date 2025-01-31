@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# usage:
+# git new-repo section/repo-name
+# 
+# example:
+# git new-repo fonts/scientifica
+# creates: user@remote:fonts/scientifica
+
+source $HOME/.config_vars
+
+if [ $# -eq 0 ]; then
+    echo "requires an arg"
+    exit 1
+fi
+
+ssh $_GIT_HOSTNAME git init --bare "$1";

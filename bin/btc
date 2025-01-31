@@ -1,0 +1,18 @@
+#!/bin/sh
+
+need curl
+need jq
+
+case $1 in
+    graph)
+        curl rate.sx/btc
+        ;;
+    all)
+        curl rate.sx
+        ;;
+    usd)
+        curl -s "https://blockchain.info/tobtc?currency=USD&value=$2"
+        ;;
+    *)
+        curl -Ss "https://blockchain.info/ticker?currency=USD" | jq -r ".USD.last"
+esac

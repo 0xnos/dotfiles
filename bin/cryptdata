@@ -1,0 +1,24 @@
+#!/bin/sh
+
+need gpg
+need openssl
+
+case $1 in
+    -e|--encrypt)
+        gpg --recipient $USER --encrypt
+    ;;
+    -d|--decrypt)
+        gpg2 --decrypt
+    ;;
+    -se|--os-encrypt)
+        openssl enc -a -aes-256-cbc -salt
+    ;;
+    -sd|--os-decrypt)
+        openssl enc -a -d -aes-256-cbc
+    ;;
+    *)
+        echo "cryptdata [-e|--encrypt] [-d|--decrypt] - Using GPG"
+        echo "cryptdata [-se|--os-encrypt] [-sd|--os-decrypt] - Using OpenSSL"
+        echo "ex: cryptdata -e < input_data > encrypted_output_data"
+    ;;
+esac

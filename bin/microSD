@@ -1,0 +1,16 @@
+#!/bin/sh
+
+case $1 in
+    format)
+        sudo mkfs.vfat -F 32 -S 4096 -n E $2
+    ;;
+    check)
+        sudo fsck.fat -v $2
+    ;;
+    *)
+        cat <<EOF
+format <DEVICE>         format device 4096/ls
+check <DEVICE>          read device's information
+EOF
+    ;;
+esac

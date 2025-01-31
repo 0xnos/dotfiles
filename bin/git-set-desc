@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# usage:
+# enter repo description into .git/description and run:
+# git set-desc 
+
+remote=$(git remote get-url --push origin)
+scp .git/description "$remote/description"

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+need curl
+need jq
+
+COLOR=$(color yellow)
+RESET=$(color reset)
+URI="https://data-asg.goldprice.org/dbXRates/USD"
+XDATA=$(curl -Ss "$URI")
+XAG=$(echo $XDATA | jq '.items[0]["xagPrice"]')
+XAU=$(echo $XDATA | jq '.items[0]["xauPrice"]')
+XAGCHG=$(echo $XDATA | jq '.items[0]["chgXag"]')
+XAUCHG=$(echo $XDATA | jq '.items[0]["chgXau"]')
+echo "${COLOR}Gold:${RESET}   \$${XAU} ($XAUCHG)"
+echo "${COLOR}Silver:${RESET} \$${XAG} ($XAGCHG)"

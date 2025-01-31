@@ -1,0 +1,25 @@
+#!/bin/sh
+
+NAME=$(uname -n)
+CURRENT_DATE=$(date +"%Y%m%d%H%M")
+FROM_DIR=$HOME
+TARGET_DIR="/mnt/$NAME-backup-$CURRENT_DATE"
+
+cargo install --list | awk '/^\w/ { print $1}' > ~/rust_pkgs.txt
+if [ -f "/etc/arch-release" ]; then
+  pacman -Q > ~/arch-pkgs.txt
+elif [ -f "/etc/gentoo-release" ]; then
+  qlist -I > ~/gentoo-pkgs.txt
+else
+  echo "Unknown linux. no packages backup"
+fi
+sudo mkdir -p $TARGET_DIR
+
+#sudo rsync -aAXv --exclude-from='/mnt/exclude.txt' $FROM_DIR $TARGET_DIR
+sudo rsync -aAXv $FROM_DIR $TARGET_DIR
+if [ -f "/etc/gentoo-release" ]; then
+  sudo rsync -aAXv /boot/config* $TARGET_DIR
+fi 
+sudo rsync -aAXv /etc $TARGET_DIR
+
+sudo du -hcs $TARGET_DIR

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+RED=`tput setaf 1`
+CLEAR=`tput sgr0`
+
+if ! has_file $1 > /dev/null 2>&1; then
+    echo "${RED}ERROR:${CLEAR} '$1' file does not existed!"
+    exit 1
+fi
